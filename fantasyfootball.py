@@ -1,20 +1,8 @@
 from time import sleep
+from inputdata import start, rounds, G
 import random
 import os, sys
 
-## INPUT DATA
-start = [
-    ["Team 1",  0,  0.0],
-    ["Team 2",  0,  0.0],
-    ["Team 3",  0,  0.0],
-    ["Team 4",  0,  0.0],
-    ["Team 5",  0,  0.0],
-    ["Team 6",  0,  0.0],
-    ["Team 7",  0,  0.0],
-    ["Team 8",  0,  0.0],
-]
-G = 35 # Rounds left
-## END INPUT DATA
 N = len(start)
 leaderboard = []
 
@@ -28,7 +16,7 @@ def main():
     try:
         iter = int(sys.argv[1])
     except:
-        iter = 10000
+        iter = 100000
 
     stats = {}
     for team in start:
@@ -46,7 +34,7 @@ def main():
         for _ in range(iter):
             board = [team[:] for team in start]
             updateBoard(board)
-            updateStats(stats, board)
+            updateStats(stats, board, iter)
             if bar: bar.next()
 
         if bar: bar.finish()
@@ -77,25 +65,17 @@ def main():
         sys.exit()
 
 
-def updateStats(stats, board: list):
+def updateStats(stats, board: list, iter: int):
     for i in range(N):
         best = max(board, key=lambda x: (x[1], x[2]))
         stats[best[0]][i] += 1
         board.remove(best)
-        leaderboard.append(best)
+        if iter == 1:
+            leaderboard.append(best)
 
 
 def updateBoard(board):
     for i in range(G):
-        rounds = [
-            [(2, 0), (5, 1), (3, 6), (7, 4)],
-            [(0, 5), (1, 7), (4, 3), (6, 2)],
-            [(6, 0), (2, 4), (3, 1), (7, 5)],
-            [(0, 7), (5, 3), (1, 2), (4, 6)],
-            [(4, 0), (2, 5), (3, 7), (6, 1)],
-            [(3, 0), (5, 6), (1, 4), (7, 2)],
-            [(0, 1), (2, 3), (4, 5), (6, 7)]
-        ]
         for round in rounds[i % (N - 1)]:
             board[round[0]], board[round[1]] = game(board[round[0]], board[round[1]])
     return board
